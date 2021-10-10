@@ -31,7 +31,7 @@ import base64
 # Program Constants/global varibables
 TXT_PROG_NAME = sys.argv[0]
 TXT_PROG_DESC = "Tool to pack/unpack Wii saves & inject REL modules."
-VERSION = "1.0.1"
+VERSION = "0.1.0"
 
 verbosity = 1
 
