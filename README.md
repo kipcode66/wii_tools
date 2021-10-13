@@ -5,6 +5,11 @@ Tools for wii homebrew
 
 This is a script to manipulate wii save files. It has a focus on allowing to patch Twilight Princess save files to inject custom code in the game, but it can be used to do various generic stuff to any wii save file.
 
+## Prerequisites
+- Python 3
+- The `pycryptodomex` python module (v`3.6.1`). You can install it using `pip` with the following command: `python3 -m pip install pycryptodomex==3.6.1`
+
+## Usage
 You can find the user manual by running the script without any argument:
 
     $ ./nandpack.py
