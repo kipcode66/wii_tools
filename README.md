@@ -8,3 +8,9 @@ This is a script to manipulate wii save files. It has a focus on allowing to pat
 You can find the user manual by running the script without any argument:
 
     $ ./nandpack.py
+
+# Licences
+
+The algorithm used for the encryption of wii save files in `nandpack` comes from the Dolphin Emulator Project, which is licenced under GPLv2. The binary data which is injected in the save files come from a source code made by PistonMiner, and edited by Zephiles, under the licence GPLv3.
+
+Otherwise, the rest of the "Wii tools" project is licenced under an MIT licence.

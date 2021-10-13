@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 # Copyright 2021 kipcode66 & Seeky
+# Based off of Dolphin Emulator Project https://github.com/dolphin-emu/dolphin.git
 # Copyright 2010 Dolphin Emulator Project
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -9,6 +10,11 @@
 # Copyright 2007,2008  Segher Boessenkool  <segher@kernel.crashing.org>
 # Licensed under the terms of the GNU GPL, version 2
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
+# The binary data loaded in the save files is taken from the REL loader code from PistonMiner.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright 2020 Linus S. (aka PistonMiner)
+# Modifications made by Zephiles
 
 import sys
 import os
