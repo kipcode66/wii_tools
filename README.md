@@ -10,7 +10,7 @@ This is a script to manipulate wii save files. It has a focus on allowing to pat
 - The `pycryptodomex` python module (v`3.6.1`). You can install it using `pip` with the following command: `python3 -m pip install pycryptodomex==3.6.1`
 
 ## Usage
-You can find the user manual by running the script without any argument:
+You can find a list and description of the available commands by running the script without any argument:
 
     $ ./nandpack.py
 
