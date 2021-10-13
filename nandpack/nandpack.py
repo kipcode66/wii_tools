@@ -1008,7 +1008,7 @@ if __name__ == "__main__":
     gen_parser.add_argument("--get-meta", type=argparse.FileType('w'),
                             help="Extract the medatada of the generated save")
     gen_parser.add_argument("-l", "--loader-version", choices=[
-                            1, 2], help="Choose which version of the loader to put in the save file", default=1)
+                            '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
     inj_parser = subparsers.add_parser(
         "inject", description="Injects into an existing save file", help="Injects into an existing save file")
     inj_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1028,7 +1028,7 @@ if __name__ == "__main__":
     inj_parser.add_argument(
         "-b", "--banner", type=argparse.FileType("rb"), help="Overwrite the banner")
     inj_parser.add_argument("-l", "--loader-version", choices=[
-                            1, 2], help="Choose which version of the loader to put in the save file", default=1)
+                            '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
     patch_parser = subparsers.add_parser(
         "patch", description="Patches a zeldaTp.dat file", help="Patches a zeldaTp.dat file")
     patch_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1042,7 +1042,7 @@ if __name__ == "__main__":
     patch_parser.add_argument("-g", "--game-version", choices=[
         "us0", "us2", "eu", "jp"], help="Version to generate the save for", required=True)
     patch_parser.add_argument("-l", "--loader-version", choices=[
-                            1, 2], help="Choose which version of the loader to put in the save file", default=1)
+        '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
     unpack_parser = subparsers.add_parser(
         "unpack", description="Unpacks a save into a directory", help="Unpacks a save into a directory")
     unpack_parser.add_argument("save", type=argparse.FileType(
