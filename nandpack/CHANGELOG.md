@@ -5,11 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Support for the version 2 of the REL loader
 
-## [0.1.1] - TBD
+## [0.2.0] - 2021-10-14
+### Added
+- Support for the version 2 of the REL loader
+- The last save time of the file is now set to the build date
+
 ### Fixes
-- Check for duplicate files.
+- Check for duplicate files
 
 ## [0.1.0] - 2021-10-10
 ### Added
