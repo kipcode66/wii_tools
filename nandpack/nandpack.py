@@ -839,6 +839,10 @@ class SaveBin:
         self.bkheader.total_size = self.bkheader.size_of_files + FULL_CERT_SZ
 
     def add_file(self, path, data, mode=0x3f, attributes=0, node_type=1):
+        indices = [i for i, f in enumerate(self.files) if f.path == path]
+        # Remove all duplicate occurences
+        if len(indices) > 0:
+            self.files = [f for i, f in enumerate(self.files) if not i in indices]
         self.files.append(SaveFile(mode, attributes, node_type, path, data))
         self._update_bk_files()
 

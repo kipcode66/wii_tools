@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Support for the version 2 of the REL loader
 
+## [0.1.1] - TBD
+### Fixes
+- Check for duplicate files.
+
 ## [0.1.0] - 2021-10-10
 ### Added
 - Inital official revision of the script
