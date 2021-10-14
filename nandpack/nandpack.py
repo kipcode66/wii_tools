@@ -29,6 +29,7 @@ import hashlib
 import secrets
 import json
 import base64
+from datetime import datetime
 
 # +----------------------+
 # | Constants definition |
@@ -55,6 +56,8 @@ NODE_TYPE_FILE = 1
 NODE_TYPE_DIR = 2
 
 DEFAULT_DEVICE_ID = 0x0403AC68
+
+OS_BUS_CLOCK = 243000000
 
 # Crypto values
 SD_KEY = bytes([0xab, 0x01, 0xb9, 0xd8, 0xe1, 0x62, 0x2b, 0x08, 0xaf, 0xba,
@@ -908,9 +911,25 @@ def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcre
         data[offsetFile1 + offset:offsetFile1 +
              offset + 4] = struct.pack('>I', value)
 
+    def patchFilesU64(offset: int, value: int):
+        data[offsetFile0 + offset:offsetFile0 +
+             offset + 8] = struct.pack('>Q', value)
+        data[offsetFile1 + offset:offsetFile1 +
+             offset + 8] = struct.pack('>Q', value)
+
+    def patchFilesS64(offset: int, value: int):
+        data[offsetFile0 + offset:offsetFile0 +
+             offset + 8] = struct.pack('>q', value)
+        data[offsetFile1 + offset:offsetFile1 +
+             offset + 8] = struct.pack('>q', value)
+
     def patchFilesBytes(offset: int, value: bytes):
         data[offsetFile0 + offset:offsetFile0 + offset + len(value)] = value
         data[offsetFile1 + offset:offsetFile1 + offset + len(value)] = value
+
+    # Write the current date as the creation date of the file
+    ticks = (datetime.utcnow() - datetime(2000, 1, 1)).total_seconds() * (OS_BUS_CLOCK / 4)
+    patchFilesS64(0x28, int(ticks))
 
     # Write the new file name (Link's name).
     patchFilesBytes(0x1B4, b'REL Loader\0')
