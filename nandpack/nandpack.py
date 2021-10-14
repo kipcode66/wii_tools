@@ -123,7 +123,7 @@ BIN_DATA_INIT = {
 }
 
 BIN_DATA_MAIN = {
-    1: {
+    '1': {
         # NA 1.0
         "us0": base64.b64decode(b"PGCANGBjxXRIAAAFfIgCpjiEAFBIAAFJiG2yYCwDAABBggAggG27SDiAAAU4oAABPYCAKmGM/Nx9iAOmToAAIThgAAA8gIAAOKAAAD2AgAFhjKn4fYkDpk6ABCCUIf/gfAgCppABACS/oQAIfH4beHyfI3g/oICwf6PreEgAAAV8iAKmOIT/gDigAvo9gIA8YYwJFH2IA6ZOgAAhf6PreDiAAvpIAADRk62/kDh9AvqQbb+UPGCANGBjd/RjpADsSAAAnTxggDRgbMV4fYkDpn/D83h/5Pt4u6EACIABACR8CAOmOCEAIE6ABCB8fxt4PGCBM2BjOpw8gICwYIQBDEgAAF1/4/t4S4R28Hx/G3g/wIAAY8MPmDyAgLA4oAL6S4wH9WPDD5g4gAL6SAAASTxggABgY4ZEY8QRXEgAACE8YIA0YGPFdDyAgABghA/0SAAADX/j+3hIgzlIfIMgUFSEAbo8oEgAfKUjeJCjAAA4gAAElCH/4HwIAqaQAQAkv6EACHx/G3h8niN4P6CANGOlYYh8qAOmToAAIWOjYmx8aAOmf+P7eH/E83hOgAAhu6EACIABACR8CAOmOCEAIE6AACCQbbJklCH/4HwIAqaQAQAkv2EACD/ggAA7wAAAOIAAjEgAALV8fRt4Y+MSiH+k63g4oAABSDcNwSwDAABAggDEOIAAIEgAAJF8ext4f6PreH9k23g4oAAgSDcFXSwDAABBgACQg5sAADucAB9XnAA0f2TbeEgAAFl/hON4SAAAWXx7G3h/o+t4f2TbeH+F43hINwUlLAMAAEGAAFiAmwAgSAAANXx8G3h/Y9t4f4TjeEg0nfUsAwABQIIAKJOfE/iTfxP8g9sANEgAADCAbbNkSC4kGIBts2Q4oAAgSC4dgH9j23hINKANf4TjeEv//+F/ZNt4S///2X+j63hINw7Nf6TreEv//8ksHgAAQYIADH/IA6ZOgAAhu2EACIABACR8CAOmOCEAIEgAc8Q="),  # 706372656C2E62696E00
         # NA 1.2
@@ -133,7 +133,7 @@ BIN_DATA_MAIN = {
         # JP
         "jp": base64.b64decode(b"PGCAM2BjimRIAAAFfIgCpjiEAFBIAAFJiG2x4CwDAABBggAggG262DiAAAU4oAABPYCAK2GMEhB9iAOmToAAIThgAAA8gIAAOKAAAD2AgAFhjKssfYkDpk6ABCCUIf/gfAgCppABACS/oQAIfH4beHyfI3g/oICwf6PreEgAAAV8iAKmOIT/gDigAvo9gIA6YYzOBH2IA6ZOgAAhf6PreDiAAvpIAADRk62++Dh9AvqQbb78PGCAM2BjPORjpADsSAAAnTxggDNgbIpofYkDpn/D83h/5Pt4u6EACIABACR8CAOmOCEAIE6ABCB8fxt4PGCBM2BjOpw8gICwYIQBDEgAAF1/4/t4S4M74Hx/G3g/wIAAY8MPmDyAgLA4oAL6S4rM5WPDD5g4gAL6SAAASTxggABgY4ZEY8QRXEgAACE8YIAzYGOKZDyAgABghA/0SAAADX/j+3hIgzlIfIMgUFSEAbo8oEgAfKUjeJCjAAA4gAAElCH/4HwIAqaQAQAkv6EACHx/G3h8niN4P6CAM2OlJnh8qAOmToAAIWOjJ1x8aAOmf+P7eH/E83hOgAAhu6EACIABACR8CAOmOCEAIE6AACCQbbHklCH/4HwIAqaQAQAkv2EACD/ggAA7wAAAOIAAjEgAALV8fRt4Y+MSiH+k63g4oAABSDXSsSwDAABAggDEOIAAIEgAAJF8ext4f6PreH9k23g4oAAgSDXKTSwDAABBgACQg5sAADucAB9XnAA0f2TbeEgAAFl/hON4SAAAWXx7G3h/o+t4f2TbeH+F43hINcoVLAMAAEGAAFiAmwAgSAAANXx8G3h/Y9t4f4TjeEgzYuUsAwABQIIAKJOfE/iTfxP8g9sANEgAADCAbbLkSCzpCIBtsuQ4oAAgSCzicH9j23hIM2T9f4TjeEv//+F/ZNt4S///2X+j63hINdO9f6TreEv//8ksHgAAQYIADH/IA6ZOgAAhu2EACIABACR8CAOmOCEAIEgAc8Q="),  # 706372656C2E62696E00
     },
-    2: {
+    '2': {
         # NA 1.0
         "us0": base64.b64decode(b"PGCANGBjxXRIAAAFfIgCpjiEAFBIAAGJiG2yYCwDAABBggAggG27SDiAAAU4oAABPYCAKmGM/Nx9iAOmToAAIThgAAA8gIAAOKAAAD2AgAFhjKn4fYkDpk6ABCCUIf/gfAgCppABACS/oQAIfH4beHyfI3g/oICwf6PreEgAAAV8iAKmOIT/gDigBAo9gIA8YYwJFH2IA6ZOgAAhf6PreDiABApIAAERk62/kDh9BAqQbb+UPGCANGBjd/RjpADsSAAA3TxggDRgbMV4fYkDpn/D83h/5Pt4u6EACIABACR8CAOmOCEAIE6ABCB8fxt4PGCBM2BjOpw8gICwYIQBDEgAAJ1/4/t4S4R28Hx/G3g/wIAAY8Nb9DyAgLA4oAQKS4wH9WPDW/Q4gAQKSAAAiTxggABgY4zsY8Rd+EgAAGE8YIAuYGMkIGPEX4xIAABRPGCAAWBjJexjxF+gSAAAQTxggAFgYyYQY8RftEgAADE8YIAAYGOGRGPEX9BIAAAhPGCANGBjxXQ8gIAAYIRcUEgAAA1/4/t4SIM5CHyDIFBUhAG6PKBIAHylI3iQowAAOIAABJQh/+B8CAKmkAEAJL+hAAh8fxt4fJ4jeD+ggDRjpWGIfKgDpk6AACFjo2JsfGgDpn/j+3h/xPN4ToAAIbuhAAiAAQAkfAgDpjghACBOgAAglCH/YHwIAqaQAQCkP+CAADgAAACQH1S0kB9UuJAfVLxINs45O8EACGPjX/R/xPN4OKAAAUg2wSUsAwAAQIIBRIOtrcg4YAAgSAAAqXx8G3iTra3If8PzeH+E43g4oAAgSDa4uSwDAAA7YAAgQYABAIN8AAA7ewAfV3sANH9j23hIAABxfHwbeH/D83h/hON4f2XbeEg2uIUsAwAAQYAAzD9AkRB/g+N4f0TTeEg0UWUsAwABQIIAoIB8AEiQba3IfJzaFHyDIFBIAAB1gJwAIDhkAB9UYwA0kH9UtH9D03hIAABdk19UuJOfVLxIAACMlCH/8HwIAqaQAQAUv8EACHx/G3g4gAAgSDP9YXx+G3g4gAAAf+X7eEv/5S1/5Pt4S//+kX/D83i7wQAIgAEAFHwIA6Y4IQAQToAAIJQh//B8CAKmkAEAFL/BAAh8nyN4S///vH+D43hINFL9f0PTeICcACBL///Zk62tyH+D43h/ZNt4S///yX/D83hINsGxgAEApHwIA6Y4IQCgVCsG/kgALWg8gIAAgIRUtHxjIhQ8H27wSC3EiDyAgACAhFS0fGQYUH/E83hIAMZAOMYMAD0AgACBCFS0fMgwUHzlMFBU57K+SADGSJBtsmQ8YIAAgGNUvCwDAABBggAQgGMANHxoA6ZOgAAhSAAmWA=="),  # 706372656C2E62696E00
         # NA 1.2
@@ -886,7 +886,7 @@ def update_checksum(data: bytes, fileNumber: int):
     return bytes(data)
 
 
-def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcrel.bin", bin_data_version=1):
+def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcrel.bin", bin_data_version='1'):
     data = bytearray(data)
 
     offsetFile0 = (fileNumber - 1) * 0xA94 + 0x8
@@ -995,6 +995,8 @@ if __name__ == "__main__":
         "generate", description="Generate a new save file", help="Generate a new save file")
     gen_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
                             help="file number to inject the custom rel into (1 to 3)")
+    gen_parser.add_argument("-n", "--name", type=parseFileName,
+                            help="overwrite the name of the internal REL file that will be loaded", default="pcrel.bin")
     gen_parser.add_argument("rel", type=argparse.FileType(
         'rb'), help="Path to the REL module to pack")
     gen_parser.add_argument("banner", type=argparse.FileType(
@@ -1013,6 +1015,8 @@ if __name__ == "__main__":
         "inject", description="Injects into an existing save file", help="Injects into an existing save file")
     inj_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
                             help="file number to inject the custom rel into (1 to 3)")
+    inj_parser.add_argument("-n", "--name", type=parseFileName,
+                            help="overwrite the name of the internal REL file that will be loaded", default="pcrel.bin")
     inj_parser.add_argument("rel", type=argparse.FileType(
         'rb'), help="Path to the REL module to pack")
     inj_parser.add_argument("save", type=argparse.FileType(
@@ -1165,7 +1169,7 @@ if __name__ == "__main__":
         if not zeldaTp_idx is None:
             for file_idx in args.index:
                 save_bin.files[zeldaTp_idx].data = bytes(
-                    patch_file(save_bin.files[zeldaTp_idx].data, file_idx, args.game_version, args.loader_version))
+                    patch_file(save_bin.files[zeldaTp_idx].data, file_idx, args.game_version, args.name, args.loader_version))
         else:
             if verbosity > 0:
                 print('Error: no "zeldaTp.dat" file in the save archive')
@@ -1249,7 +1253,7 @@ if __name__ == "__main__":
                 sys.exit(1)
         for file_idx in args.index:
             zeldaTp_data = bytes(patch_file(
-                zeldaTp_data, file_idx, args.game_version, args.loader_version))
+                zeldaTp_data, file_idx, args.game_version, args.name, args.loader_version))
         out = open(args.out, 'wb')
         out.write(zeldaTp_data)
         out.close()
