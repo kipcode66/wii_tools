@@ -3,7 +3,7 @@ Tools for wii homebrew
 
 # nandpack
 
-This is a script to manipulate wii save files. It has a focus on allowing to patch Twilight Princess save files to inject custom code in the game, but it can be used to do various generic stuff to any wii save file.
+This is a script to manipulate wii save files. It's the Wii equivalent of the `gcipack` tool from  PistonMiner's [ttyd-tools](https://github.com/PistonMiner/ttyd-tools). It has a focus on allowing to patch Twilight Princess save files to inject custom code in the game, but it can be used to do various generic stuff to any wii save file.
 
 ## Prerequisites
 - Python 3
