@@ -927,7 +927,7 @@ def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcre
         data[offsetFile0 + offset:offsetFile0 + offset + len(value)] = value
         data[offsetFile1 + offset:offsetFile1 + offset + len(value)] = value
 
-    # Write the current date as the creation date of the file
+    # Set the last save time to the current date (as a kind of build date)
     ticks = (datetime.utcnow() - datetime(2000, 1, 1)).total_seconds() * (OS_BUS_CLOCK / 4)
     patchFilesS64(0x28, int(ticks))
 
