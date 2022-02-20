@@ -934,7 +934,7 @@ def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcre
     patchFilesS64(0x28, int(ticks))
 
     # Write the new file name (Link's name).
-    patchFilesBytes(0x1B4, b'REL Loader\0')
+    patchFilesBytes(0x1B4, b'REL Loader v' + bytes(bin_data_version) + b'\0')
 
     # Overwrite the next stage string with a bunch of filler 3s.
     patchFilesBytes(0x58, b"3" * 0x12)
