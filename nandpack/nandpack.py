@@ -1071,7 +1071,7 @@ if __name__ == "__main__":
     patch_parser.add_argument("-g", "--game-version", choices=[
         "us0", "us2", "eu", "jp"], help="Version to generate the save for", required=True)
     patch_parser.add_argument("-l", "--loader-version", choices=[
-        '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
+        '1', '2'], help="Choose which version of the loader to put in the save file", default='2')
     unpack_parser = subparsers.add_parser(
         "unpack", description="Unpacks a save into a directory", help="Unpacks a save into a directory")
     unpack_parser.add_argument("save", type=argparse.FileType(
