@@ -591,7 +591,7 @@ class Header:
             Header.PACK_FORMAT):][0:hdr.banner_size]
         if (hdr.banner_size < FULL_BNR_MIN) or (hdr.banner_size > FULL_BNR_MAX) or (((hdr.banner_size - BNR_SZ) % ICON_SZ) != 0):
             if verbosity > 0:
-                print("Warning: Not a Wii save or read failure for banner size {:04x}".format(
+                print("Warning: Not a Wii save or read failure for banner size 0x{:04x}".format(
                     hdr.banner_size), hdr.banner_size)
             return
         hdr_md5 = hdr.md5
@@ -847,7 +847,8 @@ class SaveBin:
         indices = [i for i, f in enumerate(self.files) if f.path == path]
         # Remove all duplicate occurences
         if len(indices) > 0:
-            self.files = [f for i, f in enumerate(self.files) if not i in indices]
+            self.files = [f for i, f in enumerate(
+                self.files) if not i in indices]
         self.files.append(SaveFile(mode, attributes, node_type, path, data))
         self._update_bk_files()
 
@@ -895,7 +896,7 @@ def update_checksum(data: bytes, fileNumber: int):
     return bytes(data)
 
 
-def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcrel.bin", bin_data_version='1'):
+def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcrel.bin", bin_data_version='1', file_name=None):
     data = bytearray(data)
 
     offsetFile0 = (fileNumber - 1) * 0xA94 + 0x8
@@ -934,7 +935,11 @@ def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcre
     patchFilesS64(0x28, int(ticks))
 
     # Write the new file name (Link's name).
-    patchFilesBytes(0x1B4, b'REL Loader v' + bytes(bin_data_version) + b'\0')
+    if file_name is None:
+        file_name = b'REL Loader v' + bytes(bin_data_version, 'utf-8')
+    else:
+        file_name = bytes(file_name, 'utf-8')
+    patchFilesBytes(0x1B4, file_name + b'\0')
 
     # Overwrite the next stage string with a bunch of filler 3s.
     patchFilesBytes(0x58, b"3" * 0x12)
@@ -978,6 +983,13 @@ def parseFileName(string):
     if len(string) > 12:
         raise argparse.ArgumentTypeError(
             f"File name is too long (12 characters max; got {len(string)})")
+    return string
+
+
+def parseSaveFileName(string):
+    if len(string) > 31:
+        raise argparse.ArgumentTypeError(
+            f"Savefile name is too long (31 characters max; got {len(string)})")
     return string
 
 
@@ -1036,6 +1048,8 @@ if __name__ == "__main__":
                             help="Extract the medatada of the generated save")
     gen_parser.add_argument("-l", "--loader-version", choices=[
                             '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
+    gen_parser.add_argument("-f", "--file-name", type=parseSaveFileName,
+                            help="The player name in the save file (31 character max)", default=None)
     inj_parser = subparsers.add_parser(
         "inject", description="Injects into an existing save file", help="Injects into an existing save file")
     inj_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1058,6 +1072,8 @@ if __name__ == "__main__":
         "-b", "--banner", type=argparse.FileType("rb"), help="Overwrite the banner")
     inj_parser.add_argument("-l", "--loader-version", choices=[
                             '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
+    inj_parser.add_argument("-f", "--file-name", type=parseSaveFileName,
+                            help="The player name in the save file (31 character max)", default=None)
     patch_parser = subparsers.add_parser(
         "patch", description="Patches a zeldaTp.dat file", help="Patches a zeldaTp.dat file")
     patch_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1072,6 +1088,8 @@ if __name__ == "__main__":
         "us0", "us2", "eu", "jp"], help="Version to generate the save for", required=True)
     patch_parser.add_argument("-l", "--loader-version", choices=[
         '1', '2'], help="Choose which version of the loader to put in the save file", default='2')
+    patch_parser.add_argument("-f", "--file-name", type=parseSaveFileName,
+                              help="The player name in the save file (31 character max)", default=None)
     unpack_parser = subparsers.add_parser(
         "unpack", description="Unpacks a save into a directory", help="Unpacks a save into a directory")
     unpack_parser.add_argument("save", type=argparse.FileType(
@@ -1194,7 +1212,7 @@ if __name__ == "__main__":
         if not zeldaTp_idx is None:
             for file_idx in args.index:
                 save_bin.files[zeldaTp_idx].data = bytes(
-                    patch_file(save_bin.files[zeldaTp_idx].data, file_idx, args.game_version, args.name, args.loader_version))
+                    patch_file(save_bin.files[zeldaTp_idx].data, file_idx, args.game_version, args.name, args.loader_version, args.file_name))
         else:
             if verbosity > 0:
                 print('Error: no "zeldaTp.dat" file in the save archive')
@@ -1278,7 +1296,7 @@ if __name__ == "__main__":
                 sys.exit(1)
         for file_idx in args.index:
             zeldaTp_data = bytes(patch_file(
-                zeldaTp_data, file_idx, args.game_version, args.name, args.loader_version))
+                zeldaTp_data, file_idx, args.game_version, args.name, args.loader_version, args.file_name))
         out = open(args.out, 'wb')
         out.write(zeldaTp_data)
         out.close()
