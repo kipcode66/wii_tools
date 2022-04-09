@@ -5,10 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added option to change the player's name in the save file
+- Added command "banner" to extract the banner from a save file
 ### Changed
 - Changed filename to reflect which version of the loader is patched in
 - Made version 2 the default
-- Added option to change the player's name in the save file
 ### Fixed
 - Updated REL loader v1 for improved compatibility with REL loader v2
 

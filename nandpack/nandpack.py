@@ -931,7 +931,8 @@ def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "pcre
         data[offsetFile1 + offset:offsetFile1 + offset + len(value)] = value
 
     # Set the last save time to the current date (as a kind of build date)
-    ticks = (datetime.utcnow() - datetime(2000, 1, 1)).total_seconds() * (OS_BUS_CLOCK / 4)
+    ticks = (datetime.utcnow() - datetime(2000, 1, 1)
+             ).total_seconds() * (OS_BUS_CLOCK / 4)
     patchFilesS64(0x28, int(ticks))
 
     # Write the new file name (Link's name).
@@ -1027,7 +1028,7 @@ if __name__ == "__main__":
                         help="prevents output to the console", default=False)
     parser.add_argument("-V", "--version", action="version", version=VERSION)
     subparsers = parser.add_subparsers(
-        dest="command", metavar="command", help="Available commands are: generate, inject, patch, unpack, pack, meta, format")
+        dest="command", metavar="command", help="Available commands are: generate, inject, patch, unpack, pack, meta, format, banner")
     gen_parser = subparsers.add_parser(
         "generate", description="Generate a new save file", help="Generate a new save file")
     gen_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1124,10 +1125,16 @@ if __name__ == "__main__":
         'rb'), help="Path to the REL module to format")
     format_parser.add_argument(
         "out", type=str, help="Where to write the patched file")
+    banner_parser = subparsers.add_parser(
+        "banner", description="Extract banner from save file", help="Extract banner from save file")
+    banner_parser.add_argument("save", type=argparse.FileType(
+        'rb'), help="Path to the save file to unpack")
+    banner_parser.add_argument("out", type=directoryPathParser,
+                               help="Path to the file to store the banner into")
     help_parser = subparsers.add_parser(
         "help", description="Get a help guide for a command", help="Get a help guide for a command")
     help_parser.add_argument("cmd", choices=[
-                             "generate", "inject", "pack", "unpack", "patch", "meta", "format", "help"], help="A command you need help with", nargs='?')
+                             "generate", "inject", "pack", "unpack", "patch", "meta", "format", "banner", "help"], help="A command you need help with", nargs='?')
     args = parser.parse_args()
 
     if not "command" in args or args.command is None:
@@ -1135,7 +1142,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     parsers = {"generate": gen_parser, "inject": inj_parser, "patch": patch_parser,
-               "pack": pack_parser, "unpack": unpack_parser, "help": help_parser, "meta": meta_parser, "format": format_parser}
+               "pack": pack_parser, "unpack": unpack_parser, "help": help_parser, "meta": meta_parser, "format": format_parser, "banner": banner_parser}
 
     if args.command == "help":
         if not args.cmd is None:
@@ -1148,7 +1155,7 @@ if __name__ == "__main__":
 
     # Prepare the save_bin
     save_bin = None
-    if args.command in ["inject", "unpack", "meta"]:
+    if args.command in ["inject", "unpack", "meta", "banner"]:
         # We need to fetch the save_bin from a provided file
         if verbosity > 1 and args.command == "inject":
             print('injecting "{}" into "{}"'.format(
@@ -1303,6 +1310,10 @@ if __name__ == "__main__":
     elif args.command == "format":
         out = open(args.out, 'wb')
         out.write(rel_bin)
+        out.close()
+    elif args.command == "banner":
+        out = open(args.out, 'wb')
+        out.write(save_bin.header.banner)
         out.close()
     elif args.command == "meta":
         json.dump(save_bin.config(), args.out, sort_keys=True, indent=4)
