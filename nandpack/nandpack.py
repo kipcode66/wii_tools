@@ -736,18 +736,22 @@ def sign(title_id, data, device_id=DEFAULT_DEVICE_ID):
     ap_priv = bytearray(30)
     ap_priv[0x1d] = 1
 
+    logging.debug(f"Signing for device #{device_id:08x}")
     # In practice, we can reduce the encryption time by using a
     # pre-calculated "cert", but it's not a significant amount of time
     signer = f"Root-CA{CA_ID:08x}-MS{MS_ID:08x}-NG{device_id:08x}"
     name = f"AP{title_id:016x}"
+    logging.debug("Creating certificate...")
     cert = make_blank_ecc_cert(signer, name, priv_to_pub(ap_priv), 0)
     cert_packed = cert.pack()
     hash = sha1(cert_packed[0x80:])
     cert.signature.sig = sign2(DEFAULT_PRIVATE_KEY, hash)
     cert = cert.pack()
 
+    logging.debug("Signing data...")
     hash = sha1(data)
     signature = sign2(ap_priv, hash)
+    logging.debug("Signed")
 
     return (signature, cert)
 
