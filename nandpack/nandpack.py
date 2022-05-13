@@ -26,7 +26,7 @@ import struct
 import ctypes
 from io import FileIO
 from enum import IntEnum
-from typing import Any, Dict, List
+from typing import Any, ByteString, Dict, List
 from Crypto.Cipher import AES
 import hashlib
 import secrets
@@ -50,9 +50,6 @@ FULL_BNR_MAX = 0xF0A0  # BNR_SZ + 8*ICON_SZ
 BK_LISTED_SZ = 0x70
 SIG_SZ = 0x40
 FULL_CERT_SZ = 0x3C0
-
-NODE_TYPE_FILE = 1
-NODE_TYPE_DIR = 2
 
 DEFAULT_DEVICE_ID = 0x0403AC68
 
@@ -407,20 +404,28 @@ class Elt:
     def mulX(self):
         new_data = bytearray(self.data)
         carry = new_data[0] & 1
+
+        # x = (self.data[29] << 1) & 0xFF
+        # xs = itertools.chain([0], ((y << 1) & 0xFF for y in self.data[1:-1]))
+        # new_data[:-1] = list((x ^ (y >> 7)) & 0xFF for x, y in zip(xs, self.data[1:]))
         x = 0
         for i in range(29):
             y = new_data[i + 1]
             new_data[i] = (x ^ (y >> 7)) & 0xFF
             x = (y << 1) & 0xFF
+
         new_data[29] = (x ^ carry) & 0xFF
         new_data[20] ^= (carry << 2) & 0xFF
         self.data = bytes(new_data)
 
     def square(self):
+        # wide = bytearray(y for x in (
+        #     (SQUARE[x >> 4], SQUARE[x & 0xF]) for x in self.data) for y in x)
         wide = bytearray(60)
         for i in range(30):
             wide[2 * i] = SQUARE[self.data[i] >> 4]
             wide[2 * i + 1] = SQUARE[self.data[i] & 0xF]
+
         for i in range(30):
             x = wide[i]
             wide[i + 19] ^= x >> 7
@@ -454,14 +459,14 @@ class Elt:
         return s.square()
 
     def __add__(self, other):
-        if type(other) != type(self):
+        if not isinstance(other, Elt):
             raise TypeError(
                 f"Cannot add {self.__class__.__name__} "
                 f"with {other.__class__.__name__}")
         return Elt(bytes(a ^ b for a, b in zip(self.data, other.data)))
 
     def __truediv__(self, other):
-        if type(other) != type(self):
+        if not isinstance(other, Elt):
             raise TypeError(
                 f"Cannot divide {self.__class__.__name__} "
                 f"with {other.__class__.__name__}")
@@ -475,7 +480,7 @@ class Elt:
         d = Elt()
         i = 0
         mask = 1
-        for n in range(233):
+        for _ in range(233):
             d.mulX()
             if (self.data[i] & mask) != 0:
                 d = d + other
@@ -511,7 +516,7 @@ class Point:
         return r
 
     def __add__(self, other):
-        if type(other) != type(self):
+        if not isinstance(other, Point):
             raise TypeError(
                 f"Cannot add {self.__class__.__name__} "
                 f"with {other.__class__.__name__}")
@@ -535,8 +540,7 @@ class Point:
         return Point(rx, ry)
 
     def __mul__(self, other):
-        compatible_types = [bytes, bytearray]
-        if not type(other) in compatible_types:
+        if not isinstance(other, ByteString):
             raise TypeError(
                 f"Point only multiplies with bytes, "
                 f"got {other.__class__.__name__}")
@@ -950,25 +954,30 @@ class BkHeader:
         return self.to_bytes()
 
 
+class NodeType(IntEnum):
+    FILE = 1
+    DIR = 2
+
+
 class FileHDR:
     __slots__ = ("magic", "size", "permissions", "attrib",
                  "node_type", "name", "padding", "iv", "unk",)
     PACK_FORMAT = struct.Struct('>II3B64s5s16s32s')
     MAGIC = 0x03adf17e
 
-    def __init__(self, magic, size, permissions, attrib, node_type, name, padding, iv, unk):
+    def __init__(self, magic, size, permissions, attrib, node_type: NodeType, name, padding, iv, unk):
         self.magic = magic
         self.size = size
         self.permissions = permissions
         self.attrib = attrib
-        self.node_type = node_type
+        self.node_type = NodeType(node_type)
         self.name = name
         self.padding = padding
         self.iv = iv
         self.unk = unk
 
     def __str__(self) -> str:
-        return f"FileHDR(magic=0x{self.magic:08x}, size=0x{self.size:08x}, permissions=0x{self.permissions:02x}, attrib=0x{self.attrib:02x}, node_type={'File' if self.node_type == 1 else 'Directory' if self.node_type == 2 else self.node_type}, name={self.name}, padding=bytes({len(self.padding)}), iv={self.iv.hex()}, unk={self.unk})"
+        return f"FileHDR(magic=0x{self.magic:08x}, size=0x{self.size:08x}, permissions=0x{self.permissions:02x}, attrib=0x{self.attrib:02x}, node_type={self.node_type.name[:1].upper() + self.node_type.name.lower()[1:]}, name={self.name}, padding=bytes({len(self.padding)}), iv={self.iv.hex()}, unk={self.unk})"
 
     @staticmethod
     def unpack(buffer):
@@ -994,10 +1003,10 @@ class FileHDR:
 
 
 class SaveFile:
-    def __init__(self, mode=0, attributes=0, node_type=2, path="", data=None):
+    def __init__(self, mode=0, attributes=0, node_type: NodeType = NodeType.DIR, path="", data=None):
         self.mode = mode
         self.attributes = attributes
-        self.node_type = node_type
+        self.node_type = NodeType(node_type)
         self.path = path
         self.data = data
 
@@ -1005,7 +1014,7 @@ class SaveFile:
         return f"SaveFile(path={repr(self.path)}, node_type={self.node_type}, mode={self.mode}, attributes={self.attributes}, data={self.data})"
 
     def __str__(self) -> str:
-        return f"SaveFile(path=\"{self.path}\", node_type={'File' if self.node_type == 1 else 'Directory' if self.node_type == 2 else self.node_type}, mode={self.mode}, attributes={self.attributes}, data={self.data.__class__.__name__}({len(self.data)}))"
+        return f"SaveFile(path=\"{self.path}\", node_type={self.node_type.name[:1].upper() + self.node_type.name.lower()[1:]}, mode={self.mode}, attributes={self.attributes}, data={self.data.__class__.__name__}({len(self.data)}))"
 
     @staticmethod
     def unpack(reader: FileIO):
@@ -1014,7 +1023,7 @@ class SaveFile:
         if file_hdr is None:
             return
         file_data = None
-        if file_hdr.node_type == NODE_TYPE_FILE:
+        if file_hdr.node_type == NodeType.FILE:
             size = file_hdr.size
             rounded_size = alignUp(size, BLOCK_SZ)
             file_data = reader.read(rounded_size)
@@ -1111,12 +1120,30 @@ class SaveBin:
         self.bkheader.total_size = self.bkheader.size_of_files + FULL_CERT_SZ
 
     def add_file(self, path, data, mode=0x3f, attributes=0, node_type=1):
-        indices = [i for i, f in enumerate(self.files) if f.path == path]
+        indices = [i for i, f in enumerate(
+            self.files) if f.path == path]
+        indices.sort(reverse=True)
         # Remove all duplicate occurences
-        if len(indices) > 0:
-            self.files = [f for i, f in enumerate(
-                self.files) if not i in indices]
+        n_idx = len(indices)
+        if n_idx > 0:
+            logging.debug(
+                f"{n_idx} file{'s' if n_idx > 1 else ''} already exist with the same name. Removing them...")
+            for idx in indices:
+                self.files.pop(idx)
+        logging.debug(f"Adding '{path}'...")
         self.files.append(SaveFile(mode, attributes, node_type, path, data))
+        self._update_bk_files()
+
+    def rm_file(self, path):
+        indices = [i for i, f in enumerate(
+            self.files) if f.path == path]
+        indices.sort(reverse=True)
+        # Remove all occurences
+        n_idx = len(indices)
+        if n_idx > 0:
+            logging.debug(f"removing '{path}'...")
+            for idx in indices:
+                self.files.pop(idx)
         self._update_bk_files()
 
     def config(self):
@@ -1232,7 +1259,7 @@ def generate_zeldaTp(save_bin: SaveBin):
     data = bytes(0x4000)
     for i in range(1, 4):
         data = update_checksum(data, i)
-    save_bin.add_file("zeldaTp.dat", data, 0x34, 0, NODE_TYPE_FILE)
+    save_bin.add_file("zeldaTp.dat", data, 0x34, 0, NodeType.FILE)
 
 # +-------------+
 # | Main script |
@@ -1304,7 +1331,8 @@ def main():
                         help="prevents output to the console", default=False)
     parser.add_argument("-V", "--version", action="version", version=VERSION)
     subparsers = parser.add_subparsers(
-        dest="command", metavar="command", help="Available commands are: generate, inject, patch, unpack, pack, meta, format, banner")
+        dest="command", metavar="command", help="Available commands are: generate, inject, patch, unpack, pack, meta, format, banner, files")
+    # Generate
     gen_parser = subparsers.add_parser(
         "generate", description="Generate a new save file", help="Generate a new save file")
     gen_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1327,6 +1355,7 @@ def main():
                             '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
     gen_parser.add_argument("-f", "--file-name", type=parseSaveFileName,
                             help="The player name in the save file (31 character max)", default=None)
+    # Inject
     inj_parser = subparsers.add_parser(
         "inject", description="Injects into an existing save file", help="Injects into an existing save file")
     inj_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1351,6 +1380,7 @@ def main():
                             '1', '2'], help="Choose which version of the loader to put in the save file", default='1')
     inj_parser.add_argument("-f", "--file-name", type=parseSaveFileName,
                             help="The player name in the save file (31 character max)", default=None)
+    # Patch
     patch_parser = subparsers.add_parser(
         "patch", description="Patches a zeldaTp.dat file", help="Patches a zeldaTp.dat file")
     patch_parser.add_argument("-i", "--index", action="append", type=parseFileNumber,
@@ -1367,6 +1397,7 @@ def main():
         '1', '2'], help="Choose which version of the loader to put in the save file", default='2')
     patch_parser.add_argument("-f", "--file-name", type=parseSaveFileName,
                               help="The player name in the save file (31 character max)", default=None)
+    # Unpack
     unpack_parser = subparsers.add_parser(
         "unpack", description="Unpacks a save into a directory", help="Unpacks a save into a directory")
     unpack_parser.add_argument("save", type=argparse.FileType(
@@ -1375,6 +1406,7 @@ def main():
                                help="Path to the directory to unpack the save into")
     unpack_parser.add_argument("--get-meta", type=argparse.FileType('w'),
                                help="Extract the medatada of the generated save")
+    # Pack
     pack_parser = subparsers.add_parser(
         "pack", description="Packs a folder into a new save file", help="Packs data files into a new save file")
     pack_parser.add_argument("out_path", type=argparse.FileType(
@@ -1389,28 +1421,61 @@ def main():
         "-m", "--meta", type=argparse.FileType("r"), help="Metadata to use for the save file")
     pack_parser.add_argument("--get-meta", type=argparse.FileType('w'),
                              help="Extract the medatada of the generated save")
+    # Meta
     meta_parser = subparsers.add_parser(
         "meta", description="Extract metadata from a save file", help="Extract metadata from a save file")
     meta_parser.add_argument("save", type=argparse.FileType(
         'rb'), help="Save file to extract the metadata from")
     meta_parser.add_argument("out", type=argparse.FileType(
         'w'), help="Path the the file where to write the metadata (JSON format)")
+    # Format
     format_parser = subparsers.add_parser(
         "format", description="Format a rel file to make it compatible with the loader", help="Format a rel file to make it compatible with the loader")
     format_parser.add_argument("rel", type=argparse.FileType(
         'rb'), help="Path to the REL module to format")
     format_parser.add_argument(
         "out", type=str, help="Where to write the patched file")
+    # Banner
     banner_parser = subparsers.add_parser(
         "banner", description="Extract banner from save file", help="Extract banner from save file")
     banner_parser.add_argument("save", type=argparse.FileType(
         'rb'), help="Path to the save file to unpack")
     banner_parser.add_argument("out", type=filePathParser,
                                help="Path to the file to store the banner into")
+    # Files
+    files_parser = subparsers.add_parser(
+        "files", description="Operations on the file inside the save.", help="Operations on the file inside the save.")
+    files_subparser = files_parser.add_subparsers(
+        dest="files_cmd", metavar="CMD", help="Available commands are: add, list, rm")
+    # Files; Add
+    files_add_parser = files_subparser.add_parser(
+        "add", description="Adds file(s) to a save", help="Adds file(s) to a save")
+    files_add_parser.add_argument(
+        "save", type=argparse.FileType('rb'), metavar="<save>", help="Path to the save file")
+    files_add_parser.add_argument("-o", "--output", nargs='?', type=argparse.FileType(
+        'wb'), default=None, help="Path to where to store the result (default: overwrites 'save')")
+    files_add_parser.add_argument("file", type=argparse.FileType(
+        'rb'), nargs="+", metavar="<file>", help="Path to the file(s) to add to the save")
+    # Files; List
+    files_list_parser = files_subparser.add_parser(
+        "list", description="Lists the file(s) within a given save", help="Lists the files within a given save")
+    files_list_parser.add_argument("save", type=argparse.FileType(
+        'rb'), metavar="<save>", help="Path to the save file")
+    # Files; Remove
+    files_rm_parser = files_subparser.add_parser(
+        "rm", description="Removes the file(s) within the save", help="Removes the file(s) within the save")
+    files_rm_parser.add_argument("save", type=argparse.FileType(
+        'rb'), metavar="<save>", help="Path to the save file")
+    files_rm_parser.add_argument("-o", "--output", nargs='?', type=argparse.FileType(
+        'wb'), default=None, help="Path to where to store the result (default: overwrites 'save')")
+    files_rm_parser.add_argument(
+        "file", type=str, nargs="+", metavar="<file>", help="Name of the file(s) to remove from the save")
+    # Help
     help_parser = subparsers.add_parser(
         "help", description="Get a help guide for a command", help="Get a help guide for a command")
     help_parser.add_argument("cmd", choices=[
-                             "generate", "inject", "pack", "unpack", "patch", "meta", "format", "banner", "help"], help="A command you need help with", nargs='?')
+                             "generate", "inject", "pack", "unpack", "patch", "meta", "format", "banner", "files", "help"], help="A command you need help with", nargs='?')
+
     args = parser.parse_args()
 
     # Phase 1: Extract the simple options and check if it's only looking for a help text.
@@ -1420,7 +1485,7 @@ def main():
         sys.exit(0)
 
     parsers = {"generate": gen_parser, "inject": inj_parser, "patch": patch_parser,
-               "pack": pack_parser, "unpack": unpack_parser, "help": help_parser, "meta": meta_parser, "format": format_parser, "banner": banner_parser}
+               "pack": pack_parser, "unpack": unpack_parser, "help": help_parser, "meta": meta_parser, "format": format_parser, "banner": banner_parser, "files": files_parser}
 
     if args.command == "help":
         if not args.cmd is None:
@@ -1436,13 +1501,13 @@ def main():
 
     numeric_level = getattr(logging, loglevel.upper(), logging.CRITICAL)
     logging.basicConfig(
-        level=numeric_level, format="[%(levelname)s]\t%(pathname)s:%(lineno)d %(funcName)s: %(message)s")
+        level=numeric_level, format="[%(levelname)s]\t[%(asctime)s]\t%(pathname)s:%(lineno)d %(funcName)s: %(message)s")
 
     # Phase 2: Load files and data/options
 
     # Phase 2.1: Load and/or generate the Save File (if needed)
     save_bin = None
-    if args.command in ["inject", "unpack", "meta", "banner"]:
+    if args.command in ["inject", "unpack", "meta", "banner", "files"]:
         # We need to fetch the save_bin from a provided file
         with args.save as save:
             if args.command == "inject":
@@ -1478,7 +1543,7 @@ def main():
             logging.info("No file index provided, defaulting to 3")
             args.index = [3]
 
-    # Phase 2.3: Load the rel file (if needed)
+    # Phase 2.3: Load and process the rel file (if needed)
 
     rel_bin = None
     if args.command in ["inject", "generate", "format"]:
@@ -1554,7 +1619,7 @@ def main():
         save_bin._update_bk_files()
         for file in args.files:
             save_bin.add_file(os.path.basename(file.name),
-                              file.read(), node_type=NODE_TYPE_FILE)
+                              file.read(), node_type=NodeType.FILE)
             file.close()
 
         if "meta" in args and not args.meta is None:
@@ -1596,6 +1661,47 @@ def main():
         out.close()
     elif args.command == "meta":
         json.dump(save_bin.config(), args.out, sort_keys=True, indent=4)
+    elif args.command == "files":
+        if args.files_cmd == "add":
+            file_path = args.save.name
+            for file in args.file:
+                file_name = os.path.basename(file.name)
+                logging.info(f"Loading '{file_name}'...")
+                with file as f:
+                    file_data = f.read()
+                logging.debug(f"Adding '{file_name}'...")
+                save_bin.add_file(file_name, file_data)
+            if args.output is None:
+                logging.info(
+                    f"No output file provided, overwritting input save")
+                logging.debug(f"({file_path})")
+                with open(file_path, 'wb') as f:
+                    save_bin.to_file(f)
+            else:
+                with args.output as out:
+                    save_bin.to_file(out)
+        elif args.files_cmd == "list":
+            print("id\ttype\tmode\tattr\tpath")
+            for i, file in enumerate(save_bin.files):
+                print(
+                    f"#{i:04d}\t{file.node_type.name[:1].upper() + file.node_type.name.lower()[1:]}\t{file.mode}\t{file.attributes}\t{file.path}")
+        elif args.files_cmd == "rm":
+            file_path = args.save.name
+            for file in args.file:
+                save_bin.rm_file(file)
+            if args.output is None:
+                logging.info(
+                    f"No output file provided, overwritting input save")
+                logging.debug(f"({file_path})")
+                with open(file_path, 'wb') as f:
+                    save_bin.to_file(f)
+            else:
+                with args.output as out:
+                    save_bin.to_file(out)
+        # TODO Add a command to edit a file's properties.
+        else:
+            raise ValueError(
+                f"'{args.files_cmd}' is not a recognized 'files' command.")
 
 
 if __name__ == "__main__":
