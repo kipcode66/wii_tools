@@ -5,12 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.2] - 2024-01-23
 ### Added
 - Added archive edition commands (add, list, remove, ...)
 ### Changed
+- Updated loader v1 and v2 with new revision that remove the need to format RELs
 - Changed `print` calls and `verbose` global for the `logging` module
 - Using the `if __name__ == "__main__"` for better module compatibility
+- Moved function only used in `main` to `main`'s scope
 - Improved documentation.
+### Removed
+- Removed `format` command, since it is no longer needed
 
 ## [0.2.1] - 2022-04-22
 ### Added
