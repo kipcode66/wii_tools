@@ -1532,6 +1532,8 @@ def main():
 
     mappings = {}
     if args.command == "files" and args.files_cmd == "add":
+        if args.map is None:
+            args.map = []
         for m in args.map:
             mapping = NameMapping.parse(m)
             logging.debug(f"parsed mapping '{mapping.old}' to '{mapping.new}'")
