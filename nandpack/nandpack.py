@@ -550,7 +550,7 @@ class Point:
         return Point(rx, ry)
 
     def __mul__(self, other):
-        if not isinstance(other, ByteString):
+        if not isinstance(other, bytes | bytearray | memoryview):
             raise TypeError(
                 f"Point only multiplies with bytes, "
                 f"got {other.__class__.__name__}")
@@ -1707,6 +1707,13 @@ def main():
             args.get_meta.close()
 
         logging.debug(f"Generated SaveBin: {save_bin}")
+        # Recalculate the checksums
+        zeldaTp_idx = find_zeldaTp_idx(save_bin)
+        if zeldaTp_idx is not None:
+            data = save_bin.files[zeldaTp_idx].data
+            for i in range(1, 4):
+                data = update_checksum(data, i)
+            save_bin.files[zeldaTp_idx].data = data
         save_bin.to_file(args.out_path)
     elif args.command == "patch":
         if args.game_version is None:
