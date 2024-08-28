@@ -27,12 +27,12 @@ import struct
 import ctypes
 from io import FileIO
 from enum import IntEnum
-from typing import Any, ByteString, Dict, List
+from typing import Any, Dict, List
 import hashlib
 import secrets
 import json
 import base64
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 from Crypto.Cipher import AES
 
@@ -1271,7 +1271,7 @@ def patch_file(data: bytes, fileNumber: int, version: str, rel_name: str = "mod.
         data[offsetFile1 + offset:offsetFile1 + offset + len(value)] = value
 
     # Set the last save time to the current date (as a kind of build date)
-    ticks = (datetime.utcnow() - datetime(2000, 1, 1)
+    ticks = (datetime.now(timezone.utc).replace(tzinfo=None) - datetime(2000, 1, 1)
              ).total_seconds() * (OS_BUS_CLOCK / 4)
     patchFilesS64(0x28, int(ticks))
 

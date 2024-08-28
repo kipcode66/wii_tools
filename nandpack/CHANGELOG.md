@@ -5,10 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.3] - 2024-08-28
 ### Added
 - New option for `files add` command to map file names
 - Support of directories in `files` sub command
 - Recalculating checksum upon packing
+### Fixed
+- Fixed deprecated dependecies
 
 ## [0.2.2] - 2024-01-23
 ### Added
