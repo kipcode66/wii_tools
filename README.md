@@ -11,7 +11,7 @@ The resulting hacked saves can be used on Dolphin or on a real Console, with the
 
 ## Prerequisites
 - Python 3
-- The `pycryptodomex` python module (v`3.6.1`). You can install it using `pip` with the following command: `python3 -m pip install pycryptodomex==3.6.1`
+- The `pycryptodome` python module (v`3.20.0`). You can install it using `pip` with the following command: `python3 -m pip install pycryptodome==3.20.0`
 
 ## Usage
 You can find a list and description of the available commands by running the script without any argument:
